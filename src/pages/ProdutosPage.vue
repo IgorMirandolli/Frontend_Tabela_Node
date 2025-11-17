@@ -41,7 +41,6 @@
             label="Quantidade"
           />
 
-          <!-- toggle corrigido -->
           <q-toggle v-model="produtoEditando.ativo" label="Ativo?" true-value="1" false-value="0" />
         </q-card-section>
 
@@ -116,7 +115,38 @@ export default {
     },
 
     deletarProduto(id) {
-      produtosService.deletar(id).then(() => this.listarProdutos())
+      this.$q
+        .dialog({
+          title: 'Confirmar exclusão',
+          message: 'Tem certeza que deseja apagar este produto?',
+          persistent: true,
+
+          ok: {
+            label: 'Sim',
+            color: 'red',
+          },
+
+          cancel: {
+            label: 'Cancelar',
+          },
+        })
+        .onOk(() => {
+          produtosService
+            .deletar(id)
+            .then(() => {
+              this.$q.notify({
+                type: 'positive',
+                message: 'Produto apagado com sucesso!',
+              })
+              this.listarProdutos()
+            })
+            .catch(() => {
+              this.$q.notify({
+                type: 'negative',
+                message: 'Erro ao apagar produto!',
+              })
+            })
+        })
     },
   },
 }

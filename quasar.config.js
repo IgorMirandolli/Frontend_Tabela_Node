@@ -80,6 +80,8 @@ export default defineConfig((/* ctx */) => {
     framework: {
       config: {},
 
+
+
       // iconSet: 'material-icons', // Quasar icon set
       // lang: 'en-US', // Quasar language pack
 
@@ -91,7 +93,10 @@ export default defineConfig((/* ctx */) => {
       // directives: [],
 
       // Quasar plugins
-      plugins: [],
+      plugins: [
+        'Dialog',
+        'Notify',
+      ],
     },
 
     // animations: 'all', // --- includes all animations
