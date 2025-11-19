@@ -23,7 +23,6 @@
 
 <script>
 import AuthService from 'src/services/authService'
-import { useQuasar } from 'quasar'
 
 export default {
   data() {
@@ -32,11 +31,6 @@ export default {
       senha: '',
       loading: false,
     }
-  },
-
-  setup() {
-    const $q = useQuasar()
-    return { $q }
   },
 
   methods: {

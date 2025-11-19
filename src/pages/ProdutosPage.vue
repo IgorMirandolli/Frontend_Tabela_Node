@@ -6,9 +6,7 @@
       <q-btn color="primary" label="Novo Produto" @click="abrirModal()" />
     </div>
 
-    <!-- FILTROS -->
     <div class="row q-col-gutter-md q-mb-md">
-      <!-- BUSCA -->
       <div class="col-12 col-md-6">
         <q-input
           dense
@@ -25,7 +23,6 @@
         </q-input>
       </div>
 
-      <!-- FILTRO ATIVO/INATIVO -->
       <div class="col-12 col-md-3">
         <q-select
           dense
@@ -40,7 +37,6 @@
       </div>
     </div>
 
-    <!-- TABELA -->
     <q-table
       title="Produtos"
       :rows="produtosFiltrados"
@@ -53,7 +49,6 @@
       @update:pagination="paginacao = $event"
       class="shadow-2 rounded-borders"
     >
-      <!-- COLUNA ATIVO -->
       <template v-slot:body-cell-ativo="props">
         <q-td>
           <q-badge :color="props.row.ativo == 1 ? 'green' : 'red'">
@@ -62,7 +57,6 @@
         </q-td>
       </template>
 
-      <!-- COLUNA AÇÕES -->
       <template v-slot:body-cell-acoes="props">
         <q-td>
           <q-btn dense flat icon="edit" color="primary" @click="abrirModal(props.row)" />
@@ -71,7 +65,6 @@
       </template>
     </q-table>
 
-    <!-- MODAL -->
     <q-dialog v-model="modalAberto" transition-show="scale" transition-hide="scale">
       <q-card style="width: 400px">
         <q-card-section class="text-h6">
