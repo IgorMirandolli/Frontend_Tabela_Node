@@ -9,6 +9,7 @@
         <q-input v-model="nome" label="Nome" />
         <q-input v-model="email" label="Email" class="q-mt-md" />
         <q-input v-model="senha" label="Senha" type="password" class="q-mt-md" />
+        <q-input v-model="confirmarSenha" label="Confirmar Senha" type="password" class="q-mt-md" />
       </q-card-section>
 
       <q-card-actions align="center">
@@ -31,6 +32,7 @@ export default {
       nome: '',
       email: '',
       senha: '',
+      confirmarSenha: '',
       loading: false,
     }
   },
@@ -39,8 +41,18 @@ export default {
     async fazerCadastro() {
       this.loading = true
 
+      // validação das senhas
+      if (this.senha !== this.confirmarSenha) {
+        this.$q.notify({
+          type: 'negative',
+          message: 'As senhas não coincidem!',
+        })
+        this.loading = false
+        return
+      }
+
       try {
-        await AuthService.register(this.nome, this.email, this.senha)
+        await AuthService.register(this.nome, this.email, this.senha, this.confirmarSenha)
 
         this.$q.notify({
           type: 'positive',
