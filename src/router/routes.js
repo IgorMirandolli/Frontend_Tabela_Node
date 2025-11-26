@@ -17,7 +17,11 @@ const routes = [
     path: '/',
     component: () => import('layouts/MainLayout.vue'),
     children: [
-      { path: 'produtos', component: () => import('pages/ProdutosPage.vue') }
+      {
+        path: 'produtos',
+        component: () => import('pages/ProdutosPage.vue'),
+        meta: { requiresAuth: true }
+      }
     ]
   }
 ];
