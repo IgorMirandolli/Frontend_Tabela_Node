@@ -2,7 +2,12 @@
   <q-page padding>
     <!-- TOPO -->
     <div class="row items-center justify-between q-mb-md">
-      <div class="text-h5">Gerenciamento de Produtos</div>
+      <div class="row items-center">
+        <!-- BOTÃO VOLTAR -->
+        <q-btn flat round dense icon="arrow_back" class="q-mr-sm" @click="$router.back()" />
+        <div class="text-h5">Gerenciamento de Produtos</div>
+      </div>
+
       <q-btn color="primary" label="Novo Produto" @click="abrirModal()" />
     </div>
 

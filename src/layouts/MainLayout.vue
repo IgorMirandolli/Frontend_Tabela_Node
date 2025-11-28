@@ -1,26 +1,27 @@
 <template>
-  <q-layout view="lHh Lpr lFf">
-    <!-- CONTEÚDO + BOTÃO LOGOUT -->
-    <q-page-container>
-      <div class="row justify-end q-pa-md">
-        <q-btn color="primary" icon="logout" label="Logout" @click="logout" />
-      </div>
+  <q-layout view="hHh lpR fFf">
+    <q-header elevated>
+      <q-toolbar>
+        <q-toolbar-title> Painel do Sistema </q-toolbar-title>
 
+        <!-- BOTÃO LOGOUT CORRIGIDO -->
+        <q-btn flat round dense icon="logout" color="white" @click="logout" class="q-pa-sm" />
+      </q-toolbar>
+    </q-header>
+
+    <q-page-container>
       <router-view />
     </q-page-container>
   </q-layout>
 </template>
 
-<script setup>
-import authService from 'src/services/authService'
-
-function logout() {
-  authService.logout()
+<script>
+export default {
+  methods: {
+    logout() {
+      // ação de logout
+      this.$router.push('/')
+    },
+  },
 }
 </script>
-
-<style>
-.q-page-container {
-  padding-top: 0 !important;
-}
-</style>
