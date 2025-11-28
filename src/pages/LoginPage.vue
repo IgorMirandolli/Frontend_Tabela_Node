@@ -47,7 +47,7 @@ export default {
           message: 'Login realizado!',
         })
 
-        this.$router.push('/produtos')
+        this.$router.push('/dashboard')
       } catch (err) {
         this.$q.notify({
           type: 'negative',

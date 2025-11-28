@@ -1,4 +1,5 @@
 const routes = [
+
   {
     path: '/',
     redirect: '/login'
@@ -17,13 +18,14 @@ const routes = [
     path: '/',
     component: () => import('layouts/MainLayout.vue'),
     children: [
-      {
-        path: 'produtos',
-        component: () => import('pages/ProdutosPage.vue'),
-        meta: { requiresAuth: true }
-      }
+      { path: 'dashboard', component: () => import('src/pages/DashboardPage.vue'), meta: { requiresAuth: true } },
+
+      { path: 'produtos', component: () => import('src/pages/ProdutosPage.vue'), meta: { requiresAuth: true } },
+
+      { path: 'pedidos', component: () => import('src/pages/PedidosPage.vue'), meta: { requiresAuth: true } }
     ]
   }
+
 ];
 
 export default routes;
