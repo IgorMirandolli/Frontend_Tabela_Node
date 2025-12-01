@@ -1,12 +1,10 @@
 <template>
   <q-page padding class="column flex flex-center">
-    <!-- TÍTULO -->
     <div class="text-h4 text-center q-mb-lg">
       <q-icon name="shopping_cart" size="40px" class="text-primary q-mr-sm" />
       Fazer Pedido
     </div>
 
-    <!-- CARD PRINCIPAL -->
     <q-card class="q-pa-xl shadow-4" style="width: 450px; max-width: 95%; border-radius: 18px">
       <q-card-section class="column q-gutter-lg">
         <!-- SELEÇÃO DO PRODUTO -->
@@ -23,7 +21,6 @@
           prefix="Produto"
         />
 
-        <!-- QUANTIDADE -->
         <q-input
           filled
           dense
@@ -36,7 +33,6 @@
           prefix="#"
         />
 
-        <!-- TOTAL DO PEDIDO -->
         <div class="text-center q-mt-md">
           <div class="text-subtitle1 text-grey-7">Total do Pedido</div>
 
@@ -45,7 +41,6 @@
           </div>
         </div>
 
-        <!-- BOTÃO → Abre Confirmação -->
         <q-btn
           color="primary"
           label="Fazer Pedido"
@@ -58,7 +53,6 @@
       </q-card-section>
     </q-card>
 
-    <!-- ============= POPUP DE CONFIRMAÇÃO ============= -->
     <q-dialog v-model="showConfirmacao" persistent>
       <q-card class="q-pa-lg" style="min-width: 350px; border-radius: 14px">
         <div class="text-h6 text-center q-mb-md">Confirmar Pedido</div>

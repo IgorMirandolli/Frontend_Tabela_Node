@@ -41,7 +41,6 @@ export default {
     async fazerCadastro() {
       this.loading = true
 
-      // validação das senhas
       if (this.senha !== this.confirmarSenha) {
         this.$q.notify({
           type: 'negative',

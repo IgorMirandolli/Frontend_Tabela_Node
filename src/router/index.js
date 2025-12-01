@@ -23,9 +23,33 @@ export default defineRouter(function () {
 
   Router.beforeEach((to, from, next) => {
     const token = localStorage.getItem("token")
+    const role = localStorage.getItem("role")
+
+    if (to.meta.public) {
+      return next()
+    }
 
     if (to.meta.requiresAuth && !token) {
       return next('/login')
+    }
+
+    if (token && to.path === '/login') {
+      if (role === 'admin') {
+        return next('/produtos')
+      } else {
+        return next('/dashboard')
+      }
+    }
+
+    if (to.meta.role) {
+
+      if (role === 'admin' && to.meta.role === 'user') {
+        return next('/produtos')
+      }
+
+      if (role === 'user' && to.meta.role === 'admin') {
+        return next('/dashboard')
+      }
     }
 
     next()
