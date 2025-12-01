@@ -91,7 +91,14 @@ export default {
         { name: 'id', label: 'ID', field: 'id', align: 'left' },
         { name: 'id_produto', label: 'Produto', field: 'id_produto' },
         { name: 'quantidade', label: 'Qtd', field: 'quantidade' },
-        { name: 'valor_total', label: 'Valor Total', field: 'valor_total' },
+
+        {
+          name: 'valor_total',
+          label: 'Valor Total',
+          field: 'valor_total',
+          format: (val) => (val != null ? 'R$ ' + Number(val).toFixed(2).replace('.', ',') : '—'),
+        },
+
         { name: 'data_pedido', label: 'Data', field: 'data_pedido' },
         { name: 'status', label: 'Status', field: 'status' },
         { name: 'acoes', label: 'Ações', field: 'acoes' },

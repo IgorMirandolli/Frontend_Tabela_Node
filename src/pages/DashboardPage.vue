@@ -1,41 +1,86 @@
 <template>
-  <q-page padding class="flex flex-center column q-gutter-lg">
-    <div class="text-h4 text-center">Fazer Pedido</div>
+  <q-page padding class="column flex flex-center">
+    <!-- TÍTULO -->
+    <div class="text-h4 text-center q-mb-lg">
+      <q-icon name="shopping_cart" size="40px" class="text-primary q-mr-sm" />
+      Fazer Pedido
+    </div>
 
-    <q-card class="q-pa-xl" style="width: 420px; max-width: 90%">
-      <q-card-section class="q-gutter-md">
+    <!-- CARD PRINCIPAL -->
+    <q-card class="q-pa-xl shadow-4" style="width: 450px; max-width: 95%; border-radius: 18px">
+      <q-card-section class="column q-gutter-lg">
         <!-- SELEÇÃO DO PRODUTO -->
         <q-select
           filled
-          v-model="pedido.produto_id"
+          dense
+          rounded
+          v-model="pedido.id_produto"
           :options="produtos"
           label="Selecione um produto"
           emit-value
           map-options
+          @update:model-value="atualizarTotal"
+          prefix="Produto"
         />
 
         <!-- QUANTIDADE -->
         <q-input
           filled
+          dense
+          rounded
           type="number"
           v-model.number="pedido.quantidade"
           label="Quantidade"
           min="1"
+          @update:model-value="atualizarTotal"
+          prefix="#"
         />
 
-        <!-- BOTÃO -->
+        <!-- TOTAL DO PEDIDO -->
+        <div class="text-center q-mt-md">
+          <div class="text-subtitle1 text-grey-7">Total do Pedido</div>
+
+          <div class="text-h4 text-primary" style="font-weight: 700">
+            R$ {{ valorTotal.toFixed(2) }}
+          </div>
+        </div>
+
+        <!-- BOTÃO → Abre Confirmação -->
         <q-btn
           color="primary"
           label="Fazer Pedido"
           class="full-width q-mt-md"
-          @click="fazerPedido"
+          size="lg"
+          push
+          rounded
+          @click="abrirConfirmacao"
         />
       </q-card-section>
     </q-card>
+
+    <!-- ============= POPUP DE CONFIRMAÇÃO ============= -->
+    <q-dialog v-model="showConfirmacao" persistent>
+      <q-card class="q-pa-lg" style="min-width: 350px; border-radius: 14px">
+        <div class="text-h6 text-center q-mb-md">Confirmar Pedido</div>
+
+        <div class="text-body1 q-mb-md">
+          <b>Produto:</b> {{ nomeProdutoSelecionado }} <br />
+          <b>Quantidade:</b> {{ pedido.quantidade }} <br />
+          <b>Total:</b> R$ {{ valorTotal.toFixed(2) }}
+        </div>
+
+        <div class="row justify-between q-mt-lg">
+          <q-btn flat label="Cancelar" color="negative" v-close-popup />
+          <q-btn flat label="Confirmar" color="positive" @click="fazerPedido" />
+        </div>
+      </q-card>
+    </q-dialog>
   </q-page>
 </template>
 
 <script>
+import { api } from 'boot/axios'
+
 export default {
   name: 'DashboardPage',
 
@@ -44,9 +89,12 @@ export default {
       produtos: [],
 
       pedido: {
-        produto_id: null,
+        id_produto: null,
         quantidade: 1,
       },
+
+      valorTotal: 0,
+      showConfirmacao: false,
     }
   },
 
@@ -54,20 +102,22 @@ export default {
     this.carregarProdutos()
   },
 
+  computed: {
+    nomeProdutoSelecionado() {
+      const p = this.produtos.find((x) => x.value === this.pedido.id_produto)
+      return p ? p.label : ''
+    },
+  },
+
   methods: {
-    // ---------------------------------------------------
-    // 1. BUSCAR PRODUTOS DA TABELA "produtos"
-    // ---------------------------------------------------
     async carregarProdutos() {
       try {
-        // --------- AJUSTE SUA API AQUI -------------------
-        const resposta = await fetch('http://localhost:3000/produtos')
-        const data = await resposta.json()
-        // -------------------------------------------------
+        const { data } = await api.get('/produtos')
 
         this.produtos = data.map((p) => ({
-          label: p.nome,
+          label: `${p.nome} - R$ ${(Number(p.preco) || 0).toFixed(2)}`,
           value: p.id,
+          preco: Number(p.preco) || 0,
         }))
       } catch (erro) {
         console.error(erro)
@@ -78,44 +128,55 @@ export default {
       }
     },
 
-    // ---------------------------------------------------
-    // 2. CRIAR O PEDIDO E SALVAR NA TABELA "pedidos"
-    // ---------------------------------------------------
-    async fazerPedido() {
-      if (!this.pedido.produto_id) {
-        this.$q.notify({ type: 'negative', message: 'Selecione um produto!' })
+    atualizarTotal() {
+      const produto = this.produtos.find((p) => p.value === this.pedido.id_produto)
+      if (!produto) {
+        this.valorTotal = 0
         return
+      }
+      this.valorTotal = produto.preco * (this.pedido.quantidade || 1)
+    },
+
+    abrirConfirmacao() {
+      if (!this.pedido.id_produto) {
+        return this.$q.notify({
+          type: 'negative',
+          message: 'Selecione um produto!',
+        })
       }
 
       if (this.pedido.quantidade < 1) {
-        this.$q.notify({ type: 'negative', message: 'Quantidade inválida!' })
-        return
+        return this.$q.notify({
+          type: 'negative',
+          message: 'Quantidade inválida!',
+        })
       }
 
-      try {
-        // --------- AJUSTE SUA API AQUI -------------------
-        const resposta = await fetch('http://localhost:3000/pedidos', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(this.pedido),
-        })
-        // -------------------------------------------------
+      this.atualizarTotal()
+      this.showConfirmacao = true
+    },
 
-        if (!resposta.ok) throw new Error('Erro ao salvar pedido')
+    async fazerPedido() {
+      try {
+        await api.post('/pedidos', {
+          ...this.pedido,
+          valor_total: this.valorTotal,
+        })
 
         this.$q.notify({
           type: 'positive',
           message: 'Pedido realizado com sucesso!',
         })
 
-        // Resetar formulário
-        this.pedido.produto_id = null
+        this.showConfirmacao = false
+        this.pedido.id_produto = null
         this.pedido.quantidade = 1
+        this.valorTotal = 0
       } catch (erro) {
         console.error(erro)
         this.$q.notify({
           type: 'negative',
-          message: 'Não foi possível enviar o pedido',
+          message: 'Erro ao registrar pedido',
         })
       }
     },
