@@ -2,7 +2,7 @@
   <q-layout view="hHh lpR fFf">
     <q-header elevated class="bg-primary text-white q-px-md">
       <q-toolbar>
-        <q-space />
+        <!-- BOTÕES À ESQUERDA -->
         <div class="row items-center q-gutter-sm">
           <q-btn
             flat
@@ -32,17 +32,19 @@
             class="header-btn"
             @click="$router.push('/pedidos')"
           />
-
-          <q-btn
-            flat
-            dense
-            label="Sair"
-            color="negative"
-            icon="logout"
-            class="header-btn"
-            @click="confirmarLogout = true"
-          />
         </div>
+
+        <q-space />
+
+        <q-btn
+          flat
+          dense
+          label="Sair"
+          color="negative"
+          icon="logout"
+          class="header-btn"
+          @click="confirmarLogout = true"
+        />
       </q-toolbar>
     </q-header>
 
