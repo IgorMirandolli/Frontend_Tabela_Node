@@ -8,8 +8,16 @@ const routes = [
     path: '/',
     component: () => import('layouts/AuthLayout.vue'),
     children: [
-      { path: 'login', component: () => import('pages/LoginPage.vue'), meta: { public: true } },
-      { path: 'register', component: () => import('pages/RegisterPage.vue'), meta: { public: true } },
+      {
+        path: 'login',
+        component: () => import('pages/LoginPage.vue'),
+        meta: { public: true }
+      },
+      {
+        path: 'register',
+        component: () => import('pages/RegisterPage.vue'),
+        meta: { public: true }
+      },
     ]
   },
 
@@ -19,19 +27,19 @@ const routes = [
     children: [
       {
         path: 'dashboard',
-        component: () => import('src/pages/DashboardPage.vue'),
-        meta: { requiresAuth: true, roles: ['user', 'admin'] }
+        component: () => import('pages/DashboardPage.vue'),
+        meta: { requiresAuth: true, role: ['user', 'admin'] }
       },
 
       {
         path: 'produtos',
-        component: () => import('src/pages/ProdutosPage.vue'),
+        component: () => import('pages/ProdutosPage.vue'),
         meta: { requiresAuth: true, role: 'admin' }
       },
 
       {
         path: 'pedidos',
-        component: () => import('src/pages/PedidosPage.vue'),
+        component: () => import('pages/PedidosPage.vue'),
         meta: { requiresAuth: true, role: 'admin' }
       },
     ]
