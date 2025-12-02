@@ -32,6 +32,12 @@ const routes = [
       },
 
       {
+        path: 'perfil',
+        component: () => import('src/pages/PerfilPage.vue'),
+        meta: { requiresAuth: true, role: ['user', 'admin'] }
+      },
+
+      {
         path: 'produtos',
         component: () => import('pages/ProdutosPage.vue'),
         meta: { requiresAuth: true, role: 'admin' }

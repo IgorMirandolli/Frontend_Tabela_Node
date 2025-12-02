@@ -36,6 +36,16 @@
 
         <q-space />
 
+        <!-- 🔥 BOTÃO PERFIL ADICIONADO -->
+        <q-btn
+          flat
+          dense
+          label="Perfil"
+          icon="person"
+          class="header-btn q-mr-sm"
+          @click="$router.push('/perfil')"
+        />
+
         <q-btn
           flat
           dense
