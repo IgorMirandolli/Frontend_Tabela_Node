@@ -2,7 +2,6 @@
   <q-layout view="hHh lpR fFf">
     <q-header elevated class="bg-primary text-white q-px-md">
       <q-toolbar>
-        <!-- BOTÕES À ESQUERDA -->
         <div class="row items-center q-gutter-sm">
           <q-btn
             flat
@@ -36,7 +35,6 @@
 
         <q-space />
 
-        <!-- 🔥 BOTÃO PERFIL ADICIONADO -->
         <q-btn
           flat
           dense

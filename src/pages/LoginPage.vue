@@ -75,7 +75,6 @@ export default {
   background-size: cover;
 }
 
-/* 🔲 Card estilizado */
 .login-card {
   width: 350px;
   backdrop-filter: blur(10px);

@@ -1,8 +1,6 @@
 <template>
   <q-page padding>
-    <!-- TOPO -->
     <div class="row items-center justify-between q-mb-md">
-      <!-- ESQUERDA: Botão voltar + título -->
       <div class="row items-center">
         <q-btn flat round dense icon="arrow_back" class="q-mr-sm" @click="$router.back()" />
         <div class="text-h5">Gerenciamento de Pedidos</div>
@@ -11,8 +9,29 @@
       <q-btn color="primary" label="Novo Pedido" @click="abrirModal()" />
     </div>
 
-    <!-- TABELA DE PEDIDOS -->
-    <q-table title="Pedidos" :rows="pedidos" :columns="columns" row-key="id" flat bordered>
+    <div class="row q-col-gutter-md q-mb-md">
+      <div class="col-12 col-md-6">
+        <q-input
+          filled
+          v-model="filtroBusca"
+          label="Buscar pedidos"
+          debounce="300"
+          clearable
+          prefix="🔍"
+        />
+      </div>
+
+      <div class="col-12 col-md-4">
+        <q-select
+          filled
+          v-model="filtroStatus"
+          label="Status"
+          :options="['TODOS', 'ABERTO', 'PAGO', 'CANCELADO']"
+        />
+      </div>
+    </div>
+
+    <q-table title="Pedidos" :rows="pedidosFiltrados" :columns="columns" row-key="id" flat bordered>
       <template v-slot:body-cell-acoes="props">
         <q-td>
           <q-btn flat size="sm" icon="edit" color="primary" @click="editar(props.row)" />
@@ -21,7 +40,6 @@
       </template>
     </q-table>
 
-    <!-- MODAL -->
     <q-dialog v-model="modalAberto">
       <q-card style="width: 450px; max-width: 90vw">
         <q-card-section>
@@ -29,7 +47,6 @@
         </q-card-section>
 
         <q-card-section class="q-gutter-md">
-          <!-- PRODUTO -->
           <q-select
             filled
             label="Produto"
@@ -39,16 +56,12 @@
             map-options
           />
 
-          <!-- QUANTIDADE -->
           <q-input filled type="number" label="Quantidade" v-model="form.quantidade" />
 
-          <!-- VALOR TOTAL -->
           <q-input filled type="number" label="Valor Total" v-model="form.valor_total" />
 
-          <!-- DATA -->
           <q-input filled type="date" label="Data do Pedido" v-model="form.data_pedido" />
 
-          <!-- STATUS -->
           <q-select
             filled
             label="Status"
@@ -74,6 +87,9 @@ export default {
     return {
       pedidos: [],
       produtosSelect: [],
+
+      filtroBusca: '',
+      filtroStatus: 'TODOS',
 
       modalAberto: false,
       editando: false,
@@ -109,6 +125,29 @@ export default {
   mounted() {
     this.carregarPedidos()
     this.carregarProdutos()
+  },
+
+  computed: {
+    pedidosFiltrados() {
+      let lista = [...this.pedidos]
+
+      if (this.filtroBusca.trim() !== '') {
+        const busca = this.filtroBusca.toLowerCase()
+
+        lista = lista.filter(
+          (pedido) =>
+            String(pedido.id).includes(busca) ||
+            String(pedido.id_produto).includes(busca) ||
+            String(pedido.status).toLowerCase().includes(busca),
+        )
+      }
+
+      if (this.filtroStatus !== 'TODOS') {
+        lista = lista.filter((p) => p.status === this.filtroStatus)
+      }
+
+      return lista
+    },
   },
 
   methods: {
@@ -160,11 +199,24 @@ export default {
       this.carregarPedidos()
     },
 
-    async excluir(id) {
-      if (confirm('Tem certeza que deseja excluir este pedido?')) {
-        await api.delete(`/pedidos/${id}`)
-        this.carregarPedidos()
-      }
+    excluir(id) {
+      this.$q
+        .dialog({
+          title: 'Confirmar Exclusão',
+          message: 'Tem certeza que deseja excluir este pedido?',
+          ok: {
+            label: 'Excluir',
+            color: 'negative',
+          },
+          cancel: {
+            label: 'Cancelar',
+            flat: true,
+          },
+        })
+        .onOk(async () => {
+          await api.delete(`/pedidos/${id}`)
+          this.carregarPedidos()
+        })
     },
   },
 }

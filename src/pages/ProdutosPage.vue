@@ -1,9 +1,7 @@
 <template>
   <q-page padding>
-    <!-- TOPO -->
     <div class="row items-center justify-between q-mb-md">
       <div class="row items-center">
-        <!-- BOTÃO VOLTAR -->
         <q-btn flat round dense icon="arrow_back" class="q-mr-sm" @click="$router.back()" />
         <div class="text-h5">Gerenciamento de Produtos</div>
       </div>
@@ -240,22 +238,20 @@ export default {
             color: 'red',
           },
         })
-        .onOk(() => {
-          produtosService
-            .deletar(id)
-            .then(() => {
-              this.$q.notify({
-                type: 'positive',
-                message: 'Produto apagado com sucesso!',
-              })
-              this.listarProdutos()
+        .onOk(async () => {
+          try {
+            await produtosService.deletar(id)
+            this.$q.notify({
+              type: 'positive',
+              message: 'Produto excluído com sucesso!',
             })
-            .catch(() => {
-              this.$q.notify({
-                type: 'negative',
-                message: 'Erro ao apagar produto!',
-              })
+            this.listarProdutos()
+          } catch {
+            this.$q.notify({
+              type: 'negative',
+              message: 'Erro ao excluir produto!',
             })
+          }
         })
     },
   },
