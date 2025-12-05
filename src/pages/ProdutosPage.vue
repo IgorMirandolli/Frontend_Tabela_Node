@@ -52,10 +52,21 @@
       @update:pagination="paginacao = $event"
       class="shadow-2 rounded-borders"
     >
+      <template v-slot:body-cell-imagem="props">
+        <q-td>
+          <q-img
+            :src="props.row.imagem || ''"
+            style="width: 50px; height: 50px; border-radius: 6px"
+            spinner-color="primary"
+            v-if="props.row.imagem"
+          />
+        </q-td>
+      </template>
+
       <template v-slot:body-cell-ativo="props">
         <q-td>
-          <q-badge :color="props.row.ativo == 1 ? 'green' : 'red'">
-            {{ props.row.ativo == 1 ? 'Ativo' : 'Inativo' }}
+          <q-badge :color="Number(props.row.ativo) === 1 ? 'green' : 'red'">
+            {{ Number(props.row.ativo) === 1 ? 'Ativo' : 'Inativo' }}
           </q-badge>
         </q-td>
       </template>
@@ -68,6 +79,7 @@
       </template>
     </q-table>
 
+    <!-- MODAL -->
     <q-dialog v-model="modalAberto" transition-show="scale" transition-hide="scale">
       <q-card style="width: 400px">
         <q-card-section class="text-h6">
@@ -86,7 +98,16 @@
             label="Quantidade"
           />
 
-          <q-toggle v-model="produtoEditando.ativo" label="Ativo?" true-value="1" false-value="0" />
+          <!-- Imagem -->
+          <q-input filled v-model="produtoEditando.imagem" label="URL da Imagem" class="q-mt-md" />
+
+          <!-- AJUSTE CORRETO DO TOGGLE -->
+          <q-toggle
+            v-model="produtoEditando.ativo"
+            label="Ativo?"
+            :true-value="1"
+            :false-value="0"
+          />
         </q-card-section>
 
         <q-card-actions align="right">
@@ -109,7 +130,14 @@ export default {
       modalAberto: false,
       carregando: false,
       loadingSalvar: false,
-      produtoEditando: {},
+
+      produtoEditando: {
+        nome: '',
+        preco: 0,
+        quantidade: 0,
+        imagem: '',
+        ativo: 1,
+      },
 
       filtroBusca: '',
       filtroStatus: null,
@@ -125,6 +153,7 @@ export default {
 
       colunas: [
         { name: 'id', label: 'ID', field: 'id', align: 'left', sortable: true },
+        { name: 'imagem', label: 'Imagem', field: 'imagem', align: 'center' },
         { name: 'nome', label: 'Nome', field: 'nome', align: 'left', sortable: true },
 
         {
@@ -161,11 +190,15 @@ export default {
   methods: {
     listarProdutos() {
       this.carregando = true
-      produtosService.listar().then((resp) => {
-        this.produtos = resp.data
-        this.produtosFiltrados = resp.data
-        this.carregando = false
-      })
+
+      produtosService
+        .listar()
+        .then((resp) => {
+          this.produtos = resp.data
+          this.produtosFiltrados = resp.data
+        })
+        .catch(() => {})
+        .finally(() => (this.carregando = false))
     },
 
     filtrarTabela() {
@@ -186,7 +219,10 @@ export default {
     abrirModal(produto = null) {
       this.produtoEditando = produto
         ? { ...produto }
-        : { nome: '', preco: 0, quantidade: 0, ativo: 1 }
+        : { nome: '', preco: 0, quantidade: 0, imagem: '', ativo: 1 }
+
+      // 🔥 Ajuste essencial — garante que sempre seja número:
+      this.produtoEditando.ativo = Number(this.produtoEditando.ativo)
 
       this.modalAberto = true
     },
@@ -198,7 +234,7 @@ export default {
         ...this.produtoEditando,
         preco: Number(this.produtoEditando.preco),
         quantidade: Number(this.produtoEditando.quantidade),
-        ativo: Number(this.produtoEditando.ativo),
+        ativo: Number(this.produtoEditando.ativo), // 🔥 garante que vá como número
       }
 
       const acao = payload.id
@@ -221,9 +257,7 @@ export default {
             message: 'Erro ao salvar!',
           })
         })
-        .finally(() => {
-          this.loadingSalvar = false
-        })
+        .finally(() => (this.loadingSalvar = false))
     },
 
     confirmarExclusao(id) {
@@ -233,24 +267,15 @@ export default {
           message: 'Tem certeza que deseja apagar este produto?',
           cancel: true,
           persistent: true,
-          ok: {
-            label: 'Sim',
-            color: 'red',
-          },
+          ok: { label: 'Sim', color: 'red' },
         })
         .onOk(async () => {
           try {
             await produtosService.deletar(id)
-            this.$q.notify({
-              type: 'positive',
-              message: 'Produto excluído com sucesso!',
-            })
+            this.$q.notify({ type: 'positive', message: 'Produto excluído!' })
             this.listarProdutos()
           } catch {
-            this.$q.notify({
-              type: 'negative',
-              message: 'Erro ao excluir produto!',
-            })
+            this.$q.notify({ type: 'negative', message: 'Erro ao excluir!' })
           }
         })
     },
