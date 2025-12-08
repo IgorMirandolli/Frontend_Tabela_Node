@@ -8,6 +8,10 @@ export const useCartStore = defineStore('cart', () => {
         items.value.push(item)
     }
 
+    function removeFromCart(id) {
+        items.value = items.value.filter(item => item.id !== id)
+    }
+
     function clearCart() {
         items.value = []
     }
@@ -15,6 +19,7 @@ export const useCartStore = defineStore('cart', () => {
     return {
         items,
         addItem,
+        removeFromCart,
         clearCart
     }
 })

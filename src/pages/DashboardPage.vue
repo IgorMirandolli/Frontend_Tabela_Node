@@ -59,7 +59,7 @@
 
 <script>
 import { api } from 'boot/axios'
-import { useCartStore } from 'src/stores/cartStore' // assegure que o caminho/nome do arquivo está correto
+import { useCartStore } from 'src/stores/cartStore'
 
 export default {
   name: 'DashboardPage',
@@ -80,7 +80,7 @@ export default {
 
   created() {
     this.carregarProdutos()
-    this.cart = useCartStore() // instancia o store do Pinia para uso global do carrinho
+    this.cart = useCartStore() // instancia o store do Pinia
   },
 
   computed: {
@@ -122,8 +122,8 @@ export default {
       const produto = this.produtos.find((x) => x.value === this.pedido.id_produto)
       if (!produto) return
 
-      // usa o store global (Pinia)
-      this.cart.addToCart({
+      // CORREÇÃO AQUI (única mudança)
+      this.cart.addItem({
         id: produto.value,
         nome: produto.label.split(' - ')[0],
         preco: produto.preco,
@@ -137,7 +137,6 @@ export default {
         message: 'Produto adicionado ao carrinho!',
       })
 
-      // reset
       this.showConfirmacao = false
       this.pedido.id_produto = null
       this.pedido.quantidade = 1
