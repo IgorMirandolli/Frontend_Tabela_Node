@@ -1,62 +1,40 @@
 <template>
-  <q-page padding class="dashboard-bg column flex flex-center">
+  <q-page padding class="dashboard-bg column items-center">
+    <!-- Título -->
     <div class="text-h4 text-center text-white q-mb-lg titulo-dashboard">
       <q-icon name="shopping_cart" size="40px" class="q-mr-sm" />
       Fazer Pedido
     </div>
 
-    <q-card
-      class="q-pa-xl shadow-4 solid-card"
-      style="width: 450px; max-width: 95%; border-radius: 18px"
-    >
-      <q-card-section class="column q-gutter-lg">
-        <q-select
-          filled
-          dense
-          rounded
-          v-model="pedido.id_produto"
-          :options="produtos"
-          label="Selecione um produto"
-          emit-value
-          map-options
-          @update:model-value="atualizarTotal"
-          prefix="Produto"
+    <!-- GRID DOS PRODUTOS -->
+    <div class="row justify-center q-gutter-lg q-mb-xl" style="max-width: 1200px">
+      <q-card
+        v-for="p in produtos"
+        :key="p.value"
+        class="product-card shadow-4"
+        @click="selecionarProduto(p)"
+      >
+        <q-img
+          :src="p.imagem || 'https://via.placeholder.com/300x200?text=Sem+Imagem'"
+          class="product-img"
         />
-
-        <q-input
-          filled
-          dense
-          rounded
-          type="number"
-          v-model.number="pedido.quantidade"
-          label="Quantidade"
-          min="1"
-          @update:model-value="atualizarTotal"
-          prefix="#"
-        />
-
-        <div class="text-center q-mt-md">
-          <div class="text-subtitle1 text-grey-8">Total do Pedido</div>
-          <div class="text-h4 text-primary" style="font-weight: 700">
-            R$ {{ valorTotal.toFixed(2) }}
+        <q-card-section>
+          <div class="text-h6">{{ p.label.split(' - ')[0] }}</div>
+          <div class="text-subtitle2 text-primary">
+            {{ p.preco.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) }}
           </div>
-        </div>
+        </q-card-section>
 
-        <q-btn
-          color="primary"
-          label="Fazer Pedido"
-          class="full-width q-mt-md btn-modern"
-          size="lg"
-          push
-          rounded
-          @click="abrirConfirmacao"
-        />
-      </q-card-section>
-    </q-card>
+        <q-card-actions align="right">
+          <q-btn color="primary" flat icon="add_shopping_cart" @click.stop="selecionarProduto(p)" />
+        </q-card-actions>
+      </q-card>
+    </div>
 
+    <!-- DIÁLOGO DE ADICIONAR AO CARRINHO -->
     <q-dialog v-model="showConfirmacao" persistent>
       <q-card class="q-pa-lg" style="min-width: 350px; border-radius: 14px">
-        <div class="text-h6 text-center q-mb-md">Confirmar Pedido</div>
+        <div class="text-h6 text-center q-mb-md">Adicionar ao Carrinho</div>
 
         <div class="text-body1 q-mb-md">
           <b>Produto:</b> {{ nomeProdutoSelecionado }} <br />
@@ -68,10 +46,10 @@
           <q-btn flat label="Cancelar" color="negative" class="btn-flat-modern" v-close-popup />
           <q-btn
             flat
-            label="Confirmar"
+            label="Adicionar"
             color="positive"
             class="btn-flat-modern"
-            @click="fazerPedido"
+            @click="adicionarCarrinho"
           />
         </div>
       </q-card>
@@ -81,6 +59,7 @@
 
 <script>
 import { api } from 'boot/axios'
+import { useCartStore } from 'src/stores/cartStore' // assegure que o caminho/nome do arquivo está correto
 
 export default {
   name: 'DashboardPage',
@@ -101,12 +80,13 @@ export default {
 
   created() {
     this.carregarProdutos()
+    this.cart = useCartStore() // instancia o store do Pinia para uso global do carrinho
   },
 
   computed: {
     nomeProdutoSelecionado() {
       const p = this.produtos.find((x) => x.value === this.pedido.id_produto)
-      return p ? p.label : ''
+      return p ? p.label.split(' - ')[0] : ''
     },
   },
 
@@ -115,13 +95,15 @@ export default {
       try {
         const { data } = await api.get('/produtos')
 
-        this.produtos = data.map((p) => ({
+        const ativos = data.filter((p) => p.ativo === 1 || p.ativo === true || p.status === 'ativo')
+
+        this.produtos = ativos.map((p) => ({
           label: `${p.nome} - R$ ${(Number(p.preco) || 0).toFixed(2)}`,
           value: p.id,
           preco: Number(p.preco) || 0,
+          imagem: p.imagem || null,
         }))
-      } catch (erro) {
-        console.error(erro)
+      } catch {
         this.$q.notify({
           type: 'negative',
           message: 'Erro ao carregar produtos',
@@ -129,57 +111,37 @@ export default {
       }
     },
 
-    atualizarTotal() {
-      const produto = this.produtos.find((p) => p.value === this.pedido.id_produto)
-      if (!produto) {
-        this.valorTotal = 0
-        return
-      }
-      this.valorTotal = produto.preco * (this.pedido.quantidade || 1)
-    },
-
-    abrirConfirmacao() {
-      if (!this.pedido.id_produto) {
-        return this.$q.notify({
-          type: 'negative',
-          message: 'Selecione um produto!',
-        })
-      }
-
-      if (this.pedido.quantidade < 1) {
-        return this.$q.notify({
-          type: 'negative',
-          message: 'Quantidade inválida!',
-        })
-      }
-
-      this.atualizarTotal()
+    selecionarProduto(produto) {
+      this.pedido.id_produto = produto.value
+      this.pedido.quantidade = 1
+      this.valorTotal = produto.preco
       this.showConfirmacao = true
     },
 
-    async fazerPedido() {
-      try {
-        await api.post('/pedidos', {
-          ...this.pedido,
-          valor_total: this.valorTotal,
-        })
+    adicionarCarrinho() {
+      const produto = this.produtos.find((x) => x.value === this.pedido.id_produto)
+      if (!produto) return
 
-        this.$q.notify({
-          type: 'positive',
-          message: 'Pedido realizado com sucesso!',
-        })
+      // usa o store global (Pinia)
+      this.cart.addToCart({
+        id: produto.value,
+        nome: produto.label.split(' - ')[0],
+        preco: produto.preco,
+        quantidade: this.pedido.quantidade,
+      })
 
-        this.showConfirmacao = false
-        this.pedido.id_produto = null
-        this.pedido.quantidade = 1
-        this.valorTotal = 0
-      } catch (erro) {
-        console.error(erro)
-        this.$q.notify({
-          type: 'negative',
-          message: 'Erro ao registrar pedido',
-        })
-      }
+      console.log('Carrinho atual (PINIA):', this.cart.items)
+
+      this.$q.notify({
+        type: 'positive',
+        message: 'Produto adicionado ao carrinho!',
+      })
+
+      // reset
+      this.showConfirmacao = false
+      this.pedido.id_produto = null
+      this.pedido.quantidade = 1
+      this.valorTotal = 0
     },
   },
 }
@@ -196,20 +158,25 @@ export default {
   text-shadow: 0px 3px 12px rgba(0, 0, 0, 0.6);
 }
 
-/* --- BOTÃO MODERNO (principal) --- */
-.btn-modern {
-  font-weight: 600;
-  letter-spacing: 0.5px;
-  transition: 0.25s ease-in-out;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+.product-card {
+  width: 260px;
+  border-radius: 16px;
+  cursor: pointer;
+  transition: 0.25s;
 }
 
-.btn-modern:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+.product-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
 }
 
-/* --- BOTÕES FLAT DO DIÁLOGO --- */
+.product-img {
+  height: 180px;
+  object-fit: cover;
+  border-top-left-radius: 16px;
+  border-top-right-radius: 16px;
+}
+
 .btn-flat-modern {
   font-weight: 600;
   transition: 0.25s ease;

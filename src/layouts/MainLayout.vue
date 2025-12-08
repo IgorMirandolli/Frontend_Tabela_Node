@@ -35,6 +35,15 @@
 
         <q-space />
 
+        <!-- 🔵 BOTÃO DO CARRINHO ADICIONADO (SEM MUDAR NADA) -->
+        <q-btn
+          flat
+          dense
+          icon="shopping_cart"
+          class="header-btn q-mr-sm"
+          @click="$router.push('/carrinho')"
+        />
+
         <q-btn
           flat
           dense

@@ -48,6 +48,12 @@ const routes = [
         component: () => import('pages/PedidosPage.vue'),
         meta: { requiresAuth: true, role: 'admin' }
       },
+
+      {
+        path: 'carrinho',
+        component: () => import('pages/CartPage.vue'),
+        meta: { requiresAuth: true, role: ['user', 'admin'] }
+      },
     ]
   }
 ]
