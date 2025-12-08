@@ -1,8 +1,6 @@
 <template>
   <q-page class="login-page flex flex-center">
-    <!-- Card de Login -->
     <q-card class="login-card q-pa-lg">
-      <!-- LOGO -->
       <q-card-section class="text-center q-mb-md">
         <img src="../assets/techbuy-logo.png" alt="TechBuy" class="login-logo" />
       </q-card-section>
@@ -80,7 +78,6 @@ export default {
   background-size: cover;
 }
 
-/* CARD AJUSTADO */
 .login-card {
   width: 340px;
   backdrop-filter: blur(10px);
@@ -89,7 +86,6 @@ export default {
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
 }
 
-/* LOGO */
 .login-logo {
   width: 140px;
   height: auto;

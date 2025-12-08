@@ -98,10 +98,8 @@
             label="Quantidade"
           />
 
-          <!-- Imagem -->
           <q-input filled v-model="produtoEditando.imagem" label="URL da Imagem" class="q-mt-md" />
 
-          <!-- AJUSTE CORRETO DO TOGGLE -->
           <q-toggle
             v-model="produtoEditando.ativo"
             label="Ativo?"
@@ -221,7 +219,6 @@ export default {
         ? { ...produto }
         : { nome: '', preco: 0, quantidade: 0, imagem: '', ativo: 1 }
 
-      // 🔥 Ajuste essencial — garante que sempre seja número:
       this.produtoEditando.ativo = Number(this.produtoEditando.ativo)
 
       this.modalAberto = true
@@ -234,7 +231,7 @@ export default {
         ...this.produtoEditando,
         preco: Number(this.produtoEditando.preco),
         quantidade: Number(this.produtoEditando.quantidade),
-        ativo: Number(this.produtoEditando.ativo), // 🔥 garante que vá como número
+        ativo: Number(this.produtoEditando.ativo),
       }
 
       const acao = payload.id

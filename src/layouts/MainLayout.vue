@@ -35,7 +35,6 @@
 
         <q-space />
 
-        <!-- 🔵 BOTÃO DO CARRINHO ADICIONADO (SEM MUDAR NADA) -->
         <q-btn
           flat
           dense

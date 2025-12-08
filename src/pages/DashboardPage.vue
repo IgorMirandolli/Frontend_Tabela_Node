@@ -1,12 +1,10 @@
 <template>
   <q-page padding class="dashboard-bg column items-center">
-    <!-- Título -->
     <div class="text-h4 text-center text-white q-mb-lg titulo-dashboard">
       <q-icon name="shopping_cart" size="40px" class="q-mr-sm" />
       Fazer Pedido
     </div>
 
-    <!-- GRID DOS PRODUTOS -->
     <div class="row justify-center q-gutter-lg q-mb-xl" style="max-width: 1200px">
       <q-card
         v-for="p in produtos"
@@ -31,7 +29,6 @@
       </q-card>
     </div>
 
-    <!-- DIÁLOGO DE ADICIONAR AO CARRINHO -->
     <q-dialog v-model="showConfirmacao" persistent>
       <q-card class="q-pa-lg" style="min-width: 350px; border-radius: 14px">
         <div class="text-h6 text-center q-mb-md">Adicionar ao Carrinho</div>
@@ -80,7 +77,7 @@ export default {
 
   created() {
     this.carregarProdutos()
-    this.cart = useCartStore() // instancia o store do Pinia
+    this.cart = useCartStore()
   },
 
   computed: {
@@ -122,7 +119,6 @@ export default {
       const produto = this.produtos.find((x) => x.value === this.pedido.id_produto)
       if (!produto) return
 
-      // CORREÇÃO AQUI (única mudança)
       this.cart.addItem({
         id: produto.value,
         nome: produto.label.split(' - ')[0],

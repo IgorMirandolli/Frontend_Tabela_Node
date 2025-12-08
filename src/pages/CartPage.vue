@@ -2,12 +2,10 @@
   <q-page padding>
     <div class="text-h5 q-mb-md">Carrinho</div>
 
-    <!-- Carrinho vazio -->
     <q-card v-if="cart.items.length === 0" class="q-pa-md">
       <div class="text-grey">Seu carrinho está vazio.</div>
     </q-card>
 
-    <!-- Carrinho com itens -->
     <q-card v-else class="q-pa-md">
       <q-list>
         <q-item v-for="item in cart.items" :key="item.id">
@@ -22,18 +20,15 @@
         </q-item>
       </q-list>
 
-      <!-- TOTAL -->
       <div class="text-right q-mt-md text-h6">
         Total: <strong>R$ {{ totalGeral }}</strong>
       </div>
 
-      <!-- BOTÃO FAZER PEDIDO -->
       <div class="q-mt-md text-right">
         <q-btn color="primary" label="Fazer Pedido" @click="showConfirmacao = true" />
       </div>
     </q-card>
 
-    <!-- CONFIRMAÇÃO -->
     <q-dialog v-model="showConfirmacao">
       <q-card>
         <q-card-section class="text-h6"> Confirmar Pedido? </q-card-section>
@@ -43,8 +38,8 @@
         </q-card-section>
 
         <q-card-actions align="right">
-          <q-btn flat label="Cancelar" color="grey" v-close-popup />
-          <q-btn flat label="Confirmar" color="primary" @click="confirmarPedido" />
+          <q-btn flat label="Cancelar" color="red" v-close-popup />
+          <q-btn flat label="Confirmar" color="green" @click="confirmarPedido" />
         </q-card-actions>
       </q-card>
     </q-dialog>
@@ -71,7 +66,6 @@ const totalGeral = computed(() => {
 
 async function confirmarPedido() {
   try {
-    // Envia item por item, pois o backend aceita apenas 1 produto por pedido
     for (const item of cart.items) {
       await api.post('/pedidos', {
         id_produto: item.id,
