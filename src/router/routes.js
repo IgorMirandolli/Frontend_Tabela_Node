@@ -54,6 +54,12 @@ const routes = [
         component: () => import('pages/CartPage.vue'),
         meta: { requiresAuth: true, role: ['user', 'admin'] }
       },
+
+      {
+        path: 'produto/:id',
+        component: () => import('pages/ProdutoDetalhesPage.vue'),
+        meta: { requiresAuth: true, role: ['user', 'admin'] }
+      },
     ]
   }
 ]
