@@ -1,4 +1,4 @@
-import { defineRouter } from '#q-app/wrappers'
+import { route } from 'quasar/wrappers'
 import {
   createRouter,
   createMemoryHistory,
@@ -8,20 +8,20 @@ import {
 
 import routes from './routes'
 
-export default defineRouter(function () {
+export default route(function () {
   const createHistory = process.env.SERVER
     ? createMemoryHistory
     : process.env.VUE_ROUTER_MODE === 'history'
       ? createWebHistory
       : createWebHashHistory
 
-  const Router = createRouter({
+  const router = createRouter({
     scrollBehavior: () => ({ left: 0, top: 0 }),
     routes,
     history: createHistory(process.env.VUE_ROUTER_BASE)
   })
 
-  Router.beforeEach((to, from, next) => {
+  router.beforeEach((to, from, next) => {
     const token = localStorage.getItem("token")
     const role = localStorage.getItem("role")
 
@@ -55,5 +55,5 @@ export default defineRouter(function () {
     return next()
   })
 
-  return Router
+  return router
 })

@@ -100,6 +100,16 @@
 
           <q-input filled v-model="produtoEditando.imagem" label="URL da Imagem" class="q-mt-md" />
 
+          <!-- NOVA DESCRIÇÃO -->
+          <q-input
+            filled
+            type="textarea"
+            v-model="produtoEditando.descricao"
+            autogrow
+            label="Descrição"
+            class="q-mt-md"
+          />
+
           <q-toggle
             v-model="produtoEditando.ativo"
             label="Ativo?"
@@ -134,11 +144,13 @@ export default {
         preco: 0,
         quantidade: 0,
         imagem: '',
+        descricao: '', // ← ADICIONADO AQUI
         ativo: 1,
       },
 
       filtroBusca: '',
       filtroStatus: null,
+
       opcoesStatus: [
         { label: 'Ativo', value: 1 },
         { label: 'Inativo', value: 0 },
@@ -153,7 +165,13 @@ export default {
         { name: 'id', label: 'ID', field: 'id', align: 'left', sortable: true },
         { name: 'imagem', label: 'Imagem', field: 'imagem', align: 'center' },
         { name: 'nome', label: 'Nome', field: 'nome', align: 'left', sortable: true },
-
+        {
+          name: 'descricao',
+          label: 'Descrição',
+          field: 'descricao',
+          align: 'left',
+          sortable: false,
+        },
         {
           name: 'preco',
           label: 'Preço',
@@ -217,7 +235,7 @@ export default {
     abrirModal(produto = null) {
       this.produtoEditando = produto
         ? { ...produto }
-        : { nome: '', preco: 0, quantidade: 0, imagem: '', ativo: 1 }
+        : { nome: '', preco: 0, quantidade: 0, imagem: '', descricao: '', ativo: 1 }
 
       this.produtoEditando.ativo = Number(this.produtoEditando.ativo)
 
