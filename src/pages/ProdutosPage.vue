@@ -79,7 +79,6 @@
       </template>
     </q-table>
 
-    <!-- MODAL -->
     <q-dialog v-model="modalAberto" transition-show="scale" transition-hide="scale">
       <q-card style="width: 400px">
         <q-card-section class="text-h6">
@@ -100,7 +99,6 @@
 
           <q-input filled v-model="produtoEditando.imagem" label="URL da Imagem" class="q-mt-md" />
 
-          <!-- NOVA DESCRIÇÃO -->
           <q-input
             filled
             type="textarea"
